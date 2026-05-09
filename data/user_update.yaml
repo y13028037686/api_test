@@ -1,0 +1,59 @@
+user_update:
+  - id: "UPD-001"
+    description: "修改昵称（正常）"
+    preconditions: ["logged_in"]
+    request:
+      method: PUT
+      url: "/user/info"
+      headers:
+        Authorization: "Bearer {{token}}"
+      body:
+        nickname: "新昵称"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "修改成功"
+
+  - id: "UPD-002"
+    description: "修改签名（超长）"
+    preconditions: ["logged_in"]
+    request:
+      method: PUT
+      url: "/user/info"
+      headers:
+        Authorization: "Bearer {{token}}"
+      body:
+        signature: "{{long_signature}}"
+    expected:
+      status_code: 400
+      ret: 1
+      msg: "签名长度超过限制"
+
+  - id: "UPD-003"
+    description: "未登录修改"
+    preconditions: []
+    request:
+      method: PUT
+      url: "/user/info"
+      body:
+        nickname: "新昵称"
+    expected:
+      status_code: 401
+      ret: 1
+      msg: "未授权"
+
+  - id: "UPD-004"
+    description: "修改他人信息（水平越权）"
+    preconditions: ["logged_in", "other_user_logged_in"]
+    request:
+      method: PUT
+      url: "/user/info"
+      headers:
+        Authorization: "Bearer {{other_token}}"
+      body:
+        nickname: "试图修改"
+        userId: "{{target_user_id}}"
+    expected:
+      status_code: 403
+      ret: 1
+      msg: "无权限修改他人信息"
