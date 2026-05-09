@@ -1,0 +1,63 @@
+like:
+  - id: "LIKE-001"
+    description: "点赞文章"
+    preconditions: ["logged_in", "post_exists"]
+    request:
+      method: POST
+      url: "/posts/{{post_id}}/like"
+      headers:
+        Authorization: "Bearer {{token}}"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "点赞成功"
+
+  - id: "LIKE-002"
+    description: "重复点赞"
+    preconditions: ["logged_in", "already_liked"]
+    request:
+      method: POST
+      url: "/posts/{{post_id}}/like"
+      headers:
+        Authorization: "Bearer {{token}}"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "已点赞过"
+
+  - id: "LIKE-003"
+    description: "取消点赞"
+    preconditions: ["logged_in", "already_liked"]
+    request:
+      method: DELETE
+      url: "/posts/{{post_id}}/like"
+      headers:
+        Authorization: "Bearer {{token}}"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "取消点赞成功"
+
+  - id: "LIKE-004"
+    description: "未登录点赞"
+    preconditions: ["post_exists"]
+    request:
+      method: POST
+      url: "/posts/{{post_id}}/like"
+    expected:
+      status_code: 401
+      ret: 1
+      msg: "未授权"
+
+  - id: "LIKE-005"
+    description: "点赞不存在的文章"
+    preconditions: ["logged_in"]
+    request:
+      method: POST
+      url: "/posts/99999/like"
+      headers:
+        Authorization: "Bearer {{token}}"
+    expected:
+      status_code: 404
+      ret: 1
+      msg: "文章不存在"
