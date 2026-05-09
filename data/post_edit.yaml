@@ -1,0 +1,126 @@
+post_edit:
+  - id: "POST-EDT-001"
+    description: "编辑自己的文章（正常）"
+    preconditions: ["logged_in", "my_post_exists"]
+    request:
+      method: PUT
+      url: "/posts/{{post_id}}"
+      headers:
+        Authorization: "Bearer {{token}}"
+      body:
+        title: "修改后的标题"
+        content: "修改后的内容"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "编辑成功"
+
+  - id: "POST-EDT-002"
+    description: "文章ID不存在"
+    preconditions: ["logged_in"]
+    request:
+      method: PUT
+      url: "/posts/99999"
+      headers:
+        Authorization: "Bearer {{token}}"
+      body:
+        title: "标题"
+        content: "内容"
+    expected:
+      status_code: 404
+      ret: 1
+      msg: "文章不存在"
+
+  - id: "POST-EDT-003"
+    description: "标题为空"
+    preconditions: ["logged_in", "my_post_exists"]
+    request:
+      method: PUT
+      url: "/posts/{{post_id}}"
+      headers:
+        Authorization: "Bearer {{token}}"
+      body:
+        title: ""
+        content: "内容"
+    expected:
+      status_code: 400
+      ret: 1
+      msg: "标题不能为空"
+
+  - id: "POST-EDT-004"
+    description: "未登录编辑"
+    preconditions: ["post_exists"]
+    request:
+      method: PUT
+      url: "/posts/{{post_id}}"
+      body:
+        title: "标题"
+        content: "内容"
+    expected:
+      status_code: 401
+      ret: 1
+      msg: "未授权"
+
+  - id: "POST-EDT-005"
+    description: "编辑他人的文章（水平越权）"
+    preconditions: ["logged_in", "other_post_exists"]
+    request:
+      method: PUT
+      url: "/posts/{{other_post_id}}"
+      headers:
+        Authorization: "Bearer {{token}}"
+      body:
+        title: "试图修改"
+        content: "内容"
+    expected:
+      status_code: 403
+      ret: 1
+      msg: "无权限编辑他人文章"
+
+  - id: "POST-EDT-006"
+    description: "token过期"
+    preconditions: ["expired_token", "post_exists"]
+    request:
+      method: PUT
+      url: "/posts/{{post_id}}"
+      headers:
+        Authorization: "Bearer {{expired_token}}"
+      body:
+        title: "标题"
+        content: "内容"
+    expected:
+      status_code: 401
+      ret: 1
+      msg: "token已过期"
+
+  - id: "POST-EDT-007"
+    description: "编辑已删除的文章"
+    preconditions: ["logged_in", "deleted_post_exists"]
+    request:
+      method: PUT
+      url: "/posts/{{deleted_post_id}}"
+      headers:
+        Authorization: "Bearer {{token}}"
+      body:
+        title: "标题"
+        content: "内容"
+    expected:
+      status_code: 404
+      ret: 1
+      msg: "文章不存在"
+
+  - id: "POST-EDT-008"
+    description: "内容含SQL注入字符"
+    preconditions: ["logged_in", "my_post_exists"]
+    request:
+      method: PUT
+      url: "/posts/{{post_id}}"
+      headers:
+        Authorization: "Bearer {{token}}"
+      body:
+        title: "标题"
+        content: "'; DROP TABLE posts; --"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "编辑成功，注入字符被安全处理"
