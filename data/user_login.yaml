@@ -1,0 +1,71 @@
+user_login:
+  - id: "LOG-001"
+    description: "正确用户名密码"
+    preconditions: ["existing_user"]
+    request:
+      method: POST
+      url: "/user/login"
+      body:
+        username: "{{existing_username}}"
+        password: "Password123!"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "登录成功"
+      token_returned: true
+
+  - id: "LOG-002"
+    description: "密码错误"
+    preconditions: ["existing_user"]
+    request:
+      method: POST
+      url: "/user/login"
+      body:
+        username: "{{existing_username}}"
+        password: "wrongpassword"
+    expected:
+      status_code: 401
+      ret: 1
+      msg: "密码错误"
+
+  - id: "LOG-003"
+    description: "用户名不存在"
+    preconditions: []
+    request:
+      method: POST
+      url: "/user/login"
+      body:
+        username: "nonexistent"
+        password: "anypass"
+    expected:
+      status_code: 401
+      ret: 1
+      msg: "用户不存在"
+
+  - id: "LOG-004"
+    description: "用户名为空"
+    preconditions: []
+    request:
+      method: POST
+      url: "/user/login"
+      body:
+        username: ""
+        password: "anypass"
+    expected:
+      status_code: 400
+      ret: 1
+      msg: "用户名不能为空"
+
+  - id: "LOG-005"
+    description: "密码为空"
+    preconditions: []
+    request:
+      method: POST
+      url: "/user/login"
+      body:
+        username: "someuser"
+        password: ""
+    expected:
+      status_code: 400
+      ret: 1
+      msg: "密码不能为空"
