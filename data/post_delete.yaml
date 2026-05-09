@@ -1,0 +1,63 @@
+post_delete:
+  - id: "POST-DEL-001"
+    description: "删除自己的文章"
+    preconditions: ["logged_in", "my_post_exists"]
+    request:
+      method: DELETE
+      url: "/posts/{{post_id}}"
+      headers:
+        Authorization: "Bearer {{token}}"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "删除成功"
+
+  - id: "POST-DEL-002"
+    description: "删除不存在的文章"
+    preconditions: ["logged_in"]
+    request:
+      method: DELETE
+      url: "/posts/99999"
+      headers:
+        Authorization: "Bearer {{token}}"
+    expected:
+      status_code: 404
+      ret: 1
+      msg: "文章不存在"
+
+  - id: "POST-DEL-003"
+    description: "未登录删除"
+    preconditions: ["post_exists"]
+    request:
+      method: DELETE
+      url: "/posts/{{post_id}}"
+    expected:
+      status_code: 401
+      ret: 1
+      msg: "未授权"
+
+  - id: "POST-DEL-004"
+    description: "删除他人文章（水平越权）"
+    preconditions: ["logged_in", "other_post_exists"]
+    request:
+      method: DELETE
+      url: "/posts/{{other_post_id}}"
+      headers:
+        Authorization: "Bearer {{token}}"
+    expected:
+      status_code: 403
+      ret: 1
+      msg: "无权限删除他人文章"
+
+  - id: "POST-DEL-005"
+    description: "重复删除同一文章"
+    preconditions: ["logged_in", "deleted_post_exists"]
+    request:
+      method: DELETE
+      url: "/posts/{{deleted_post_id}}"
+      headers:
+        Authorization: "Bearer {{token}}"
+    expected:
+      status_code: 404
+      ret: 1
+      msg: "文章不存在"
