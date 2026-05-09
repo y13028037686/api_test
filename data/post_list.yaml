@@ -1,0 +1,70 @@
+post_list:
+  - id: "POST-LIST-001"
+    description: "默认第1页，每页10条"
+    preconditions: ["multiple_posts"]
+    request:
+      method: GET
+      url: "/posts"
+      params:
+        page: 1
+        size: 10
+    expected:
+      status_code: 200
+      ret: 0
+      list_length: 10
+
+  - id: "POST-LIST-002"
+    description: "page=1, size=20"
+    preconditions: ["multiple_posts"]
+    request:
+      method: GET
+      url: "/posts"
+      params:
+        page: 1
+        size: 20
+    expected:
+      status_code: 200
+      ret: 0
+      list_length: 20
+
+  - id: "POST-LIST-003"
+    description: "page=0（无效边界）"
+    preconditions: []
+    request:
+      method: GET
+      url: "/posts"
+      params:
+        page: 0
+        size: 10
+    expected:
+      status_code: 400
+      ret: 1
+      msg: "页码从1开始"
+
+  - id: "POST-LIST-004"
+    description: "size=0（无效边界）"
+    preconditions: []
+    request:
+      method: GET
+      url: "/posts"
+      params:
+        page: 1
+        size: 0
+    expected:
+      status_code: 400
+      ret: 1
+      msg: "每页数量必须大于0"
+
+  - id: "POST-LIST-005"
+    description: "size=100（超过最大限制）"
+    preconditions: []
+    request:
+      method: GET
+      url: "/posts"
+      params:
+        page: 1
+        size: 100
+    expected:
+      status_code: 400
+      ret: 1
+      msg: "每页数量不能超过50"
