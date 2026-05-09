@@ -1,0 +1,77 @@
+post_search:
+  - id: "SEARCH-001"
+    description: "关键字匹配"
+    preconditions: ["posts_with_keyword"]
+    request:
+      method: GET
+      url: "/posts/search"
+      params:
+        keyword: "测试"
+    expected:
+      status_code: 200
+      ret: 0
+
+  - id: "SEARCH-002"
+    description: "关键字无匹配"
+    preconditions: []
+    request:
+      method: GET
+      url: "/posts/search"
+      params:
+        keyword: "不存在的关键字XYZ"
+    expected:
+      status_code: 200
+      ret: 0
+      empty_list: true
+
+  - id: "SEARCH-003"
+    description: "关键字为空"
+    preconditions: []
+    request:
+      method: GET
+      url: "/posts/search"
+      params:
+        keyword: ""
+    expected:
+      status_code: 400
+      ret: 1
+      msg: "关键字不能为空"
+
+  - id: "SEARCH-004"
+    description: "关键字含SQL注入'"
+    preconditions: []
+    request:
+      method: GET
+      url: "/posts/search"
+      params:
+        keyword: "' OR 1=1 --"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "无报错，正常处理"
+
+  - id: "SEARCH-005"
+    description: "关键字含XSS"
+    preconditions: []
+    request:
+      method: GET
+      url: "/posts/search"
+      params:
+        keyword: "<script>alert(1)</script>"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "脚本被转义"
+
+  - id: "SEARCH-006"
+    description: "关键字超长"
+    preconditions: []
+    request:
+      method: GET
+      url: "/posts/search"
+      params:
+        keyword: "{{long_keyword}}"
+    expected:
+      status_code: 400
+      ret: 1
+      msg: "关键字长度超过限制"
