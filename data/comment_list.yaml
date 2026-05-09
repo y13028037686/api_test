@@ -1,0 +1,38 @@
+comment_list:
+  - id: "COMM-LIST-001"
+    description: "获取文章评论列表"
+    preconditions: ["post_with_comments"]
+    request:
+      method: GET
+      url: "/comments"
+      params:
+        post_id: "{{post_id}}"
+    expected:
+      status_code: 200
+      ret: 0
+
+  - id: "COMM-LIST-002"
+    description: "文章无评论"
+    preconditions: ["post_without_comments"]
+    request:
+      method: GET
+      url: "/comments"
+      params:
+        post_id: "{{post_id}}"
+    expected:
+      status_code: 200
+      ret: 0
+      empty_list: true
+
+  - id: "COMM-LIST-003"
+    description: "文章ID不存在"
+    preconditions: []
+    request:
+      method: GET
+      url: "/comments"
+      params:
+        post_id: 99999
+    expected:
+      status_code: 404
+      ret: 1
+      msg: "文章不存在"
