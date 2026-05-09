@@ -1,0 +1,44 @@
+post_detail:
+  - id: "POST-DTL-001"
+    description: "查看已发布文章"
+    preconditions: ["post_exists"]
+    request:
+      method: GET
+      url: "/posts/{{post_id}}"
+    expected:
+      status_code: 200
+      ret: 0
+
+  - id: "POST-DTL-002"
+    description: "查看不存在的文章"
+    preconditions: []
+    request:
+      method: GET
+      url: "/posts/99999"
+    expected:
+      status_code: 404
+      ret: 1
+      msg: "文章不存在"
+
+  - id: "POST-DTL-003"
+    description: "未登录查看公开文章"
+    preconditions: ["post_exists"]
+    request:
+      method: GET
+      url: "/posts/{{post_id}}"
+    expected:
+      status_code: 200
+      ret: 0
+
+  - id: "POST-DTL-004"
+    description: "查看他人草稿（越权）"
+    preconditions: ["draft_post_exists", "other_user_logged_in"]
+    request:
+      method: GET
+      url: "/posts/{{draft_post_id}}"
+      headers:
+        Authorization: "Bearer {{other_token}}"
+    expected:
+      status_code: 403
+      ret: 1
+      msg: "无权限查看他人草稿"
