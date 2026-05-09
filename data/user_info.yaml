@@ -1,0 +1,23 @@
+user_info:
+  - id: "INFO-001"
+    description: "携带有效token"
+    preconditions: ["logged_in"]
+    request:
+      method: GET
+      url: "/user/info"
+      headers:
+        Authorization: "Bearer {{token}}"
+    expected:
+      status_code: 200
+      ret: 0
+
+  - id: "INFO-002"
+    description: "未携带token"
+    preconditions: []
+    request:
+      method: GET
+      url: "/user/info"
+    expected:
+      status_code: 401
+      ret: 1
+      msg: "未授权"
