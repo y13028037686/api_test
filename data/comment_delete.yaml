@@ -1,0 +1,50 @@
+comment_delete:
+  - id: "COMM-DEL-001"
+    description: "删除自己的评论"
+    preconditions: ["logged_in", "my_comment_exists"]
+    request:
+      method: DELETE
+      url: "/comments/{{comment_id}}"
+      headers:
+        Authorization: "Bearer {{token}}"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "删除成功"
+
+  - id: "COMM-DEL-002"
+    description: "删除他人评论（越权）"
+    preconditions: ["other_comment_exists", "logged_in"]
+    request:
+      method: DELETE
+      url: "/comments/{{other_comment_id}}"
+      headers:
+        Authorization: "Bearer {{token}}"
+    expected:
+      status_code: 403
+      ret: 1
+      msg: "无权限删除他人评论"
+
+  - id: "COMM-DEL-003"
+    description: "未登录删除"
+    preconditions: ["comment_exists"]
+    request:
+      method: DELETE
+      url: "/comments/{{comment_id}}"
+    expected:
+      status_code: 401
+      ret: 1
+      msg: "未授权"
+
+  - id: "COMM-DEL-004"
+    description: "评论已删除"
+    preconditions: ["logged_in", "deleted_comment_exists"]
+    request:
+      method: DELETE
+      url: "/comments/{{deleted_comment_id}}"
+      headers:
+        Authorization: "Bearer {{token}}"
+    expected:
+      status_code: 404
+      ret: 1
+      msg: "评论不存在"
