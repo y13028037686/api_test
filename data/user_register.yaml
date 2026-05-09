@@ -1,0 +1,98 @@
+user_register:
+  - id: "REG-001"
+    description: "正常注册（合法用户名、密码）"
+    preconditions: []
+    request:
+      method: POST
+      url: "/user/register"
+      body:
+        username: "{{username}}"
+        password: "Password123!"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "注册成功"
+
+  - id: "REG-002"
+    description: "用户名为空"
+    preconditions: []
+    request:
+      method: POST
+      url: "/user/register"
+      body:
+        username: ""
+        password: "Password123!"
+    expected:
+      status_code: 400
+      ret: 1
+      msg: "用户名不能为空"
+
+  - id: "REG-003"
+    description: "用户名长度3（无效边界）"
+    preconditions: []
+    request:
+      method: POST
+      url: "/user/register"
+      body:
+        username: "abc"
+        password: "Password123!"
+    expected:
+      status_code: 400
+      ret: 1
+      msg: "用户名长度需为4-16"
+
+  - id: "REG-004"
+    description: "用户名长度4（有效边界）"
+    preconditions: []
+    request:
+      method: POST
+      url: "/user/register"
+      body:
+        username: "abcd"
+        password: "Password123!"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "注册成功"
+
+  - id: "REG-005"
+    description: "用户名长度16（有效边界）"
+    preconditions: []
+    request:
+      method: POST
+      url: "/user/register"
+      body:
+        username: "abcdefghijklmnop"
+        password: "Password123!"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "注册成功"
+
+  - id: "REG-006"
+    description: "用户名长度17（无效边界）"
+    preconditions: []
+    request:
+      method: POST
+      url: "/user/register"
+      body:
+        username: "abcdefghijklmnopq"
+        password: "Password123!"
+    expected:
+      status_code: 400
+      ret: 1
+      msg: "用户名长度需为4-16"
+
+  - id: "REG-007"
+    description: "用户名已存在"
+    preconditions: ["existing_user"]
+    request:
+      method: POST
+      url: "/user/register"
+      body:
+        username: "{{existing_username}}"
+        password: "Password123!"
+    expected:
+      status_code: 409
+      ret: 1
+      msg: "用户已存在"
