@@ -1,0 +1,94 @@
+post_create:
+  - id: "POST-CRT-001"
+    description: "正常发布（标题+内容）"
+    preconditions: ["logged_in"]
+    request:
+      method: POST
+      url: "/posts"
+      headers:
+        Authorization: "Bearer {{token}}"
+      body:
+        title: "测试文章标题"
+        content: "这是测试内容"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "发布成功"
+
+  - id: "POST-CRT-002"
+    description: "标题为空"
+    preconditions: ["logged_in"]
+    request:
+      method: POST
+      url: "/posts"
+      headers:
+        Authorization: "Bearer {{token}}"
+      body:
+        title: ""
+        content: "内容"
+    expected:
+      status_code: 400
+      ret: 1
+      msg: "标题不能为空"
+
+  - id: "POST-CRT-003"
+    description: "内容为空"
+    preconditions: ["logged_in"]
+    request:
+      method: POST
+      url: "/posts"
+      headers:
+        Authorization: "Bearer {{token}}"
+      body:
+        title: "标题"
+        content: ""
+    expected:
+      status_code: 400
+      ret: 1
+      msg: "内容不能为空"
+
+  - id: "POST-CRT-004"
+    description: "标题超长（>100字符）"
+    preconditions: ["logged_in"]
+    request:
+      method: POST
+      url: "/posts"
+      headers:
+        Authorization: "Bearer {{token}}"
+      body:
+        title: "{{long_title}}"
+        content: "内容"
+    expected:
+      status_code: 400
+      ret: 1
+      msg: "标题长度不能超过100"
+
+  - id: "POST-CRT-005"
+    description: "未登录发布"
+    preconditions: []
+    request:
+      method: POST
+      url: "/posts"
+      body:
+        title: "标题"
+        content: "内容"
+    expected:
+      status_code: 401
+      ret: 1
+      msg: "未授权"
+
+  - id: "POST-CRT-006"
+    description: "包含XSS脚本"
+    preconditions: ["logged_in"]
+    request:
+      method: POST
+      url: "/posts"
+      headers:
+        Authorization: "Bearer {{token}}"
+      body:
+        title: "<script>alert('xss')</script>"
+        content: "正常内容"
+    expected:
+      status_code: 200
+      ret: 0
+      msg: "发布成功，脚本被转义"
