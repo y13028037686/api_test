@@ -1,1 +1,6 @@
+base_url: "http://test.example.com"
+timeout: 10
+retries: 3
 
+account:
+  default_password: "123456"
