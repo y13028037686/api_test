@@ -10,32 +10,6 @@ from common.cleanup import CleanupManager
 from config.settings import load_settings
 
 
-def pytest_addoption(parser):
-    parser.addoption(
-        "--env",
-        action="store",
-        default="dev",
-        help="运行环境：dev / test"
-    )
-
-
-def generate_username(prefix: str = "test_user") -> str:
-    return f"{prefix}_{uuid.uuid4().hex[:8]}"
-
-
-@pytest.fixture(scope="session")
-def settings(pytestconfig):
-    env = pytestconfig.getoption("--env")
-    return load_settings(env)
-
-
-@pytest.fixture
-def cleanup_manager():
-    manager = CleanupManager()
-    yield manager
-    manager.run()
-
-
 @pytest.fixture
 def api_client(settings):
     client = ApiClient(
@@ -348,3 +322,28 @@ def expired_token_fixture(settings, logged_user):
     token = user_info["token"]
     invalid_token = token[:-1] + ('A' if token[-1] != 'A' else 'B')
     return invalid_token
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--env",
+        action="store",
+        default="dev",
+        help="运行环境：dev / test"
+    )
+
+
+def generate_username(prefix: str = "test_user") -> str:
+    return f"{prefix}_{uuid.uuid4().hex[:8]}"
+
+
+@pytest.fixture(scope="session")
+def settings(pytestconfig):
+    env = pytestconfig.getoption("--env")
+    return load_settings(env)
+
+
+@pytest.fixture
+def cleanup_manager():
+    manager = CleanupManager()
+    yield manager
+    manager.run()
